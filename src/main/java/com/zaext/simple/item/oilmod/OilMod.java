@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.EnchantedCountIncreaseFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
@@ -78,6 +79,7 @@ public class OilMod implements ModInitializer {
 		// add oil fat to fuel reg
 		FuelRegistryEvents.BUILD.register((builder, context) -> builder.add(OIL_FAT, 600));
 
+
 		LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
 			if (source.isBuiltin() &&
 					(isResourceKeyMatching(key, EntityType.PIG) ||
@@ -87,9 +89,10 @@ public class OilMod implements ModInitializer {
 				LootPool.Builder poolBuilder = LootPool.lootPool()
 						.setRolls(ConstantValue.exactly(1f))
 						.add(LootItem.lootTableItem(OIL_FAT))
-						.apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f)));
+						.apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f)))
+						.apply(EnchantedCountIncreaseFunction.lootingMultiplier(registries, UniformGenerator.between(1.0f, 2.0f)));
 
-				tableBuilder.pool(poolBuilder.build());
+				tableBuilder.withPool(poolBuilder);
 
 			}
 		});
