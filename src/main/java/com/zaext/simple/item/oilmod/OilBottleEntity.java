@@ -7,8 +7,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -17,10 +20,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
+import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class OilBottleEntity extends ThrowableItemProjectile {
@@ -87,12 +93,28 @@ public class OilBottleEntity extends ThrowableItemProjectile {
             if (this.level() instanceof ServerLevel serverLevel) {
                 AABB searchArea = new AABB(hitPos).inflate(3.0D);
 
-                List<LivingEntity> entitiesNearby = this.level().getEntitiesOfClass(LivingEntity.class, searchArea);
+                List<Entity> entitiesNearby = this.level().getEntitiesOfClass(Entity.class, searchArea);
 
-                for (LivingEntity entity : entitiesNearby) {
-                    entity.addEffect(new MobEffectInstance(OilMod.OIL_SOAKED, 400, 0));
+                Set<LivingEntity> uniqueTargets = new HashSet<>();
+
+                for (Entity entity : entitiesNearby) {
+                    if (entity instanceof LivingEntity living) {
+                        uniqueTargets.add(living);
+                    } else if (entity instanceof EnderDragonPart part) {
+                        if (part.parentMob instanceof LivingEntity dragon) {
+                            uniqueTargets.add(dragon);
+                        }
+                    }
+                }
+                for (LivingEntity entity : uniqueTargets) {
+                    int curAmp = -1;
+                    var existingEffect = entity.getEffect(OilMod.OIL_SOAKED);
+                    if (existingEffect != null) {
+                        curAmp = existingEffect.getAmplifier();
+                    }
+                    entity.addEffect(new MobEffectInstance(OilMod.OIL_SOAKED, 400, Math.min(curAmp + 1, 2)));
                     entity.igniteForSeconds(20.0F);
-                    // entity.hurtServer(serverLevel, this.damageSources().inFire(), 1.0F);
+                    entity.hurtServer(serverLevel, entity instanceof EnderDragon ? this.damageSources().indirectMagic(this, this.getOwner()) : this.damageSources().magic(), entity.getHealth() * RandomUtils.secure().randomFloat(0.05f, 0.25f));
                 }
             }
 

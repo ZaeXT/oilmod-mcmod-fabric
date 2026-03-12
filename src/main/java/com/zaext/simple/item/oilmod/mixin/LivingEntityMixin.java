@@ -32,8 +32,18 @@ public abstract class LivingEntityMixin {
     private float increaseFireDamageWhenOilSoaked(float amount, ServerLevel level, DamageSource source) {
         LivingEntity self = (LivingEntity) (Object) this;
 
-        if (source.is(DamageTypeTags.IS_FIRE) && self.hasEffect(OilMod.OIL_SOAKED)) {
-            return amount * 1.5f; // 增加50%火焰伤害
+        if (source.is(DamageTypeTags.IS_FIRE)) {
+            var effectInstance = self.getEffect(OilMod.OIL_SOAKED);
+            if (effectInstance != null) {
+                int amplifier = effectInstance.getAmplifier();
+                float multiplier = switch (amplifier) {
+                    case 0 -> 1.5F;
+                    case 1 -> 2.5F;
+                    case 2 -> 5F;
+                    default -> 1.0F;
+                };
+                return amount * multiplier;
+            }
         }
 
         return amount;
