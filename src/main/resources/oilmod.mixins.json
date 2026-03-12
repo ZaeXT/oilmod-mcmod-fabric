@@ -1,9 +1,11 @@
 {
 	"required": true,
-	"package": "com.example.mixin",
+	"package": "com.zaext.simple.item.oilmod.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"OilMixin",
+		"EntityMixin",
+		"LivingEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

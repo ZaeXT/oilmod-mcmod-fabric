@@ -22,7 +22,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"modid" {
+		"oil_bottle" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

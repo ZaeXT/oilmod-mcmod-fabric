@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    " G ",
+    "   "
+  ],
+  "key": {
+    "C": "oilmod:oil_fat",
+    "G": "minecraft:glass_bottle"
+  },
+  "result": {
+    "count": 1,
+    "id": "oilmod:oil_bottle"
+  }
+}
